@@ -45,14 +45,6 @@ public class ComposeTweetActivity extends Activity {
 	private TextView tvUserScreenName;
 	private User currentUser;
 	
-	private enum ComposeTweetResponseStatus {
-		SUCCESS,
-		FAILURE;
-	}
-	
-	private ComposeTweetResponseStatus responseStatus = 
-			ComposeTweetResponseStatus.FAILURE;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -82,27 +74,7 @@ public class ComposeTweetActivity extends Activity {
 		// Internet is available. Prepare to post a new status update to Twitter
 		final String newTweet = etUpdateStatus.getText().toString();
 		
-		postStatusUpdateToTwitter(newTweet);
-		
-		// Pass data to timeline activity according to the result of posting the new tweet
-		if (responseStatus == ComposeTweetResponseStatus.SUCCESS) {
-			
-			// XXX: fix the asynchronicity issue
-			Log.d("debug", "Returning success");
-			
-			final Tweet newlyComposedTweet = new Tweet(newTweet, "0s", currentUser);
-			
-			statusUpdatedIntent.putExtra("newlyComposedTweet", newlyComposedTweet);
-			
-			// Set result and close this activity
-			setResult(RESULT_OK, statusUpdatedIntent);
-		} else {
-			
-			Log.d("debug", "Returning failure");
-			setResult(RESULT_CANCELED, statusUpdatedIntent);
-		}
-		
-		finish();
+		postStatusUpdateAndReturnToTimeline(newTweet);
 	}
 	
 	/* Private methods */
@@ -159,27 +131,45 @@ public class ComposeTweetActivity extends Activity {
 		});
 	}
 
-	private void postStatusUpdateToTwitter(final String newTweet) {
+	// Send the new tweet to Twitter and return to TimelineActivity
+	private void postStatusUpdateAndReturnToTimeline(final String newTweet) {
 		
 		twitterClient.updateStatus(new JsonHttpResponseHandler() {
 
+			final Intent statusUpdatedIntent = new Intent();
+			
+			@Override
+			public void onSuccess(JSONObject jsonObject) {
+				
+				// If the post was successful, pass it to TimelineActivity for
+				// immediate display (without lag).
+				final Tweet newlyComposedTweet = new Tweet(newTweet, "0s", currentUser);
+				statusUpdatedIntent.putExtra("newlyComposedTweet", newlyComposedTweet);
+				// Set result and close this activity
+				setResult(RESULT_OK, statusUpdatedIntent);
+				
+				Log.d("debug", "Tweet posted successfully: " + newTweet);
+				Toast.makeText(getApplicationContext(), 
+						"Tweet sent successfully!", Toast.LENGTH_SHORT).show();
+				super.onSuccess(jsonObject);
+				
+				// Close this activity
+				finish();
+			}
+			
 			@Override
 			public void onFailure(Throwable t, String s) {
+				
+				// If the tweet couldn't be posted, don't pass it to TimelineActivity
+				setResult(RESULT_CANCELED, statusUpdatedIntent);
 				
 				Log.d("debug", "Tweet post failed: " + newTweet);
 				Toast.makeText(getApplicationContext(), 
 						"Tweet could not be sent!", Toast.LENGTH_SHORT).show();
 				super.onFailure(t, s);
-			}
-
-			@Override
-			public void onSuccess(JSONObject jsonObject) {
 				
-				responseStatus = ComposeTweetResponseStatus.SUCCESS;
-				Log.d("debug", "Tweet posted successfully: " + newTweet);
-				Toast.makeText(getApplicationContext(), 
-						"Tweet sent successfully!", Toast.LENGTH_SHORT).show();
-				super.onSuccess(jsonObject);
+				// Close this activity
+				finish();
 			}
 		
 		}, TwitterClient.getRequestParameters("status", newTweet));
