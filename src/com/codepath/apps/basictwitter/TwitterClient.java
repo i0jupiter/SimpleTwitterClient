@@ -84,9 +84,9 @@ public class TwitterClient extends OAuthBaseClient {
 		final RequestParams requestParams = new RequestParams();
 		
 		for (int i = 0; i < numParams; i += 2) {
-			Log.d("debug", "putting args: " + args[i] + " " + args[i + 1]);
 			requestParams.put(args[i], args[i + 1]);
 		}
+		
 		return requestParams;
 	}
     

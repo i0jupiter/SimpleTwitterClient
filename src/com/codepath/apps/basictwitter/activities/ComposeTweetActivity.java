@@ -1,5 +1,7 @@
 package com.codepath.apps.basictwitter.activities;
 
+import java.util.Date;
+
 import org.json.JSONObject;
 
 import android.app.Activity;
@@ -20,7 +22,6 @@ import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApplication;
 import com.codepath.apps.basictwitter.TwitterClient;
 import com.codepath.apps.basictwitter.helpers.NetworkUtils;
-import com.codepath.apps.basictwitter.models.Tweet;
 import com.codepath.apps.basictwitter.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -61,6 +62,7 @@ public class ComposeTweetActivity extends Activity {
 
 	public void onUpdateStatus(View v) {
 		
+		final long timeOfStatusUpdateInMS = new Date().getTime();
 		final Intent statusUpdatedIntent = new Intent();
 		
 		// Check for Internet availability
@@ -74,7 +76,8 @@ public class ComposeTweetActivity extends Activity {
 		// Internet is available. Prepare to post a new status update to Twitter
 		final String newTweet = etUpdateStatus.getText().toString();
 		
-		postStatusUpdateAndReturnToTimeline(newTweet);
+		postStatusUpdateAndReturnToTimeline(newTweet, 
+				timeOfStatusUpdateInMS);
 	}
 	
 	/* Private methods */
@@ -132,7 +135,8 @@ public class ComposeTweetActivity extends Activity {
 	}
 
 	// Send the new tweet to Twitter and return to TimelineActivity
-	private void postStatusUpdateAndReturnToTimeline(final String newTweet) {
+	private void postStatusUpdateAndReturnToTimeline(final String newTweet, 
+			final long timeOfUpdate) {
 		
 		twitterClient.updateStatus(new JsonHttpResponseHandler() {
 
@@ -141,10 +145,6 @@ public class ComposeTweetActivity extends Activity {
 			@Override
 			public void onSuccess(JSONObject jsonObject) {
 				
-				// If the post was successful, pass it to TimelineActivity for
-				// immediate display (without lag).
-				final Tweet newlyComposedTweet = new Tweet(newTweet, "0s", currentUser);
-				statusUpdatedIntent.putExtra("newlyComposedTweet", newlyComposedTweet);
 				// Set result and close this activity
 				setResult(RESULT_OK, statusUpdatedIntent);
 				

@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.codepath.apps.basictwitter.R;
@@ -25,6 +24,9 @@ import com.codepath.apps.basictwitter.models.UserTimeline;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
+import eu.erikw.PullToRefreshListView;
+import eu.erikw.PullToRefreshListView.OnRefreshListener;
+
 /**
  * Main activity showing the Twitter timeline of the user.
  * 
@@ -34,13 +36,15 @@ import com.loopj.android.http.RequestParams;
 public class TimelineActivity extends Activity {
 
 	private final int COMPOSE_TWEET_REQUEST_CODE = 100;
-	private static long MAX_TWEET_ID = Long.MAX_VALUE;
+	
+	private long MAX_TWEET_ID = Long.MAX_VALUE;
+	private long SINCE_TWEET_ID = 1L;
 	
 	private TwitterClient twitterClient;
 
 	private ArrayList<Tweet> tweets;
 	private ArrayAdapter<Tweet> aTweets;
-	private ListView lvTweets;
+	private PullToRefreshListView ptrlvTweets;
 	private UserTimeline currentUserTimeline;
 	
 	@Override
@@ -63,11 +67,15 @@ public class TimelineActivity extends Activity {
 		getCurrentUserTimeline(TwitterClient.getRequestParameters("screen_name", 
 				TwitterClient.USER_SCREEN_NAME, "count", "1"));
 		
+		// Pull down to get latest tweets
+		handlePullToRefresh();
+		// Scroll down infinitely to load more tweets on the timeline
+		handleTimelineScroll();
+		
 		// Clear the adapter before loading any tweets
 		aTweets.clear();
-		populateTimeline(TwitterClient.getRequestParameters("since_id", "1"));
-		
-		handleTimelineScroll();
+		populateTimeline(TwitterClient.getRequestParameters("since_id", "1"), 
+				false /* This is the first load of the dataset. Add as received. */);
 	}
 
 	// Create the action bar for this activity
@@ -95,18 +103,11 @@ public class TimelineActivity extends Activity {
 		Log.d("debug", "in onActivityResult: resultCode: " + requestCode + " resultCode: " + resultCode);
 		
 		if (resultCode == RESULT_OK && requestCode == COMPOSE_TWEET_REQUEST_CODE) {
-		
-			final Tweet newTweet = 
-					(Tweet) data.getSerializableExtra("newlyComposedTweet");
 			
-			Log.d("debug", "Came back to main activity: " + newTweet.toString());
-			final ArrayList<Tweet> updatedTweetList = new ArrayList<Tweet>();
-			updatedTweetList.add(newTweet);
-			updatedTweetList.addAll(tweets);
-			tweets.clear();
-			tweets.addAll(updatedTweetList);
-			updatedTweetList.clear();
-			aTweets.notifyDataSetChanged();
+			Log.d("debug", "Trying to refresh timeline after composing tweet: " + SINCE_TWEET_ID);
+			populateTimeline(TwitterClient.getRequestParameters("since_id", 
+					Long.toString(SINCE_TWEET_ID)), 
+					true /* add new tweets to top */);
 		}
 	}
 	
@@ -116,14 +117,17 @@ public class TimelineActivity extends Activity {
 	private void setupViews() {
 		
 		twitterClient = TwitterApplication.getRestClient();
-		lvTweets = (ListView) findViewById(R.id.lvTweets);
+		
+		ptrlvTweets = (PullToRefreshListView) findViewById(R.id.ptrlvTweets);
 		tweets = new ArrayList<Tweet>();
 		aTweets = new TweetArrayAdapter(this, tweets);
-		lvTweets.setAdapter(aTweets);
+		ptrlvTweets.setAdapter(aTweets);
 	}
 	
 	// Get the current user's timeline
 	private void getCurrentUserTimeline(RequestParams requestParams) {
+		
+		Log.d("debug", "Getting current timeline. requestParams: " + requestParams);
 		
 		twitterClient.getCurrentUserTimeline(new JsonHttpResponseHandler() {
 
@@ -146,7 +150,9 @@ public class TimelineActivity extends Activity {
 	}
 	
 	// Get the current user's timeline
-	private void populateTimeline(RequestParams requestParams) {
+	private void populateTimeline(RequestParams requestParams, final boolean addToTop) {
+		
+	    Log.d("debug", "Populating. requestParams: " + requestParams + ", addToTop: " + addToTop);
 		
 		twitterClient.getHomeTimeline(new JsonHttpResponseHandler() {
 
@@ -156,8 +162,17 @@ public class TimelineActivity extends Activity {
 				super.onSuccess(jsonArray);
 				final ArrayList<Tweet> tweetsLoadedInThisBatch = 
 						Tweet.fromJsonArray(jsonArray);
-				aTweets.addAll(tweetsLoadedInThisBatch);
-				determineMinTweetId(tweetsLoadedInThisBatch);			
+				Log.d("debug", "Got tweets: " + tweetsLoadedInThisBatch);
+				
+				if (!addToTop) {
+					aTweets.addAll(tweetsLoadedInThisBatch);
+					// As more past tweets are fetched, max_id will change
+					determineMaxTweetId(tweetsLoadedInThisBatch);
+				} else {
+					addLatestTweetsToTimeline(tweetsLoadedInThisBatch);
+					// As latest tweets are fetched, since_id will change
+					determineSinceTweetId(tweetsLoadedInThisBatch);
+				}
 			}
 
 			@Override
@@ -170,11 +185,47 @@ public class TimelineActivity extends Activity {
 		}, requestParams);
 	}
 	
-	// home_timeline endpoint already returns tweets in reverse chronological order.
-	// It may not be necessary to determine the max_id by traversing the list of tweets
-	// returned in this load.
-	// But using this logic to be foolproof, anyway.
-	private void determineMinTweetId(ArrayList<Tweet> tweetsInThisBatch) {
+	// Pull down to get the latest tweets
+	// Uses since_id
+	private void handlePullToRefresh() {
+		
+		Log.d("debug", "handling pull to refresh");
+		
+		ptrlvTweets.setOnRefreshListener(new OnRefreshListener() {
+			
+			@Override
+			public void onRefresh() {
+				
+				Log.d("debug", "populating pull to refresh");
+				
+				populateTimeline(TwitterClient.getRequestParameters("since_id", 
+						Long.toString(SINCE_TWEET_ID)), 
+						true /* add new tweets to top */);
+				ptrlvTweets.onRefreshComplete();
+			}
+		});
+	}
+	
+	// Infinite scroll to load more tweets from the past
+	// Uses max_id
+	private void handleTimelineScroll() {
+	
+		Log.d("debug", "handling infinite scroll");
+		ptrlvTweets.setOnScrollListener(new EndlessScrollListener() {
+			
+			@Override
+			public void onLoadMore(int page, int totalItemsCount) {
+				
+				Log.d("debug", "populating infinite scroll");
+				
+				populateTimeline(TwitterClient.getRequestParameters("max_id", 
+						Long.toString(MAX_TWEET_ID)), false /* more tweets will be added at the bottom */);
+			}
+		});
+	}
+	
+	// Determine the max_id so that the future infinite-scroll queries can be optimized.
+	private void determineMaxTweetId(ArrayList<Tweet> tweetsInThisBatch) {
 		
 		// If no new tweets were loaded, we'll use the previously set value of max_id
 		if (tweetsInThisBatch == null || tweetsInThisBatch.size() == 0) {
@@ -189,19 +240,45 @@ public class TimelineActivity extends Activity {
 		}
 		
 		MAX_TWEET_ID = --minTweetId;
-		Log.d("Debug", "Max tweet id: " + MAX_TWEET_ID);
+		Log.d("Debug", "New max_id: " + MAX_TWEET_ID);
 	}
 	
-	private void handleTimelineScroll() {
+	// Determine the since_id so that the future pull-to-refresh queries can be optimized.
+	private void determineSinceTweetId(ArrayList<Tweet> tweetsInThisBatch) {
 		
-		lvTweets.setOnScrollListener(new EndlessScrollListener() {
-			
-			@Override
-			public void onLoadMore(int page, int totalItemsCount) {
-				
-				populateTimeline(TwitterClient.getRequestParameters("max_id", 
-						Long.toString(MAX_TWEET_ID)));
+		// If no new tweets were loaded, we'll use the previously set value of max_id
+		if (tweetsInThisBatch == null || tweetsInThisBatch.size() == 0) {
+			return;
+		}
+		
+		long maxTweetId = SINCE_TWEET_ID; // start from the previous value
+		for (Tweet tweet : tweetsInThisBatch) {
+			if (tweet.getTid() >= maxTweetId) {
+				maxTweetId = tweet.getTid();
 			}
-		});
+		}
+		
+		SINCE_TWEET_ID = maxTweetId;
+		Log.d("Debug", "New since_id: " + SINCE_TWEET_ID);
+	}
+	
+	private void addLatestTweetsToTimeline(ArrayList<Tweet> latestTweets) {
+		
+		// Create a new (temp) ArrayList of tweets
+		final ArrayList<Tweet> updatedTweetList = new ArrayList<Tweet>();
+		// Add the latest tweets to it first
+		updatedTweetList.addAll(latestTweets);
+		// Then add the existing tweets
+		updatedTweetList.addAll(tweets);
+		
+		// Clear the list associated with the adapter
+		tweets.clear();
+		// Add everything from the updated tweet list
+		tweets.addAll(updatedTweetList);
+		// Notify adapter of change in dataset
+		aTweets.notifyDataSetChanged();
+		
+		// Clear the temp list to reduce data held in memory
+		updatedTweetList.clear();
 	}
 }
