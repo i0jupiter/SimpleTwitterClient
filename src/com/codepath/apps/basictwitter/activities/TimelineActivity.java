@@ -127,7 +127,7 @@ public class TimelineActivity extends Activity {
 	// Get the current user's timeline
 	private void getCurrentUserTimeline(RequestParams requestParams) {
 		
-		Log.d("debug", "Getting current timeline. requestParams: " + requestParams);
+		Log.d("debug", "Getting current user's timeline with params: " + requestParams);
 		
 		twitterClient.getCurrentUserTimeline(new JsonHttpResponseHandler() {
 
@@ -136,7 +136,8 @@ public class TimelineActivity extends Activity {
 
 				super.onSuccess(jsonArray);
 				currentUserTimeline = UserTimeline.fromJsonArray(jsonArray).get(0);
-				Log.d("debug", "Got timeline successfully: " + currentUserTimeline.getUser().toString());
+				Log.d("debug", "Got current user's timeline successfully: " 
+						+ currentUserTimeline.getUser().toString());
 			}
 
 			@Override
@@ -152,7 +153,8 @@ public class TimelineActivity extends Activity {
 	// Get the current user's timeline
 	private void populateTimeline(RequestParams requestParams, final boolean addToTop) {
 		
-	    Log.d("debug", "Populating. requestParams: " + requestParams + ", addToTop: " + addToTop);
+	    Log.d("debug", "Populating timeline with params: " + requestParams 
+	    		+ " and adding tweets at the " + (addToTop == true ? "top." : "bottom."));
 		
 		twitterClient.getHomeTimeline(new JsonHttpResponseHandler() {
 
@@ -162,7 +164,7 @@ public class TimelineActivity extends Activity {
 				super.onSuccess(jsonArray);
 				final ArrayList<Tweet> tweetsLoadedInThisBatch = 
 						Tweet.fromJsonArray(jsonArray);
-				Log.d("debug", "Got tweets: " + tweetsLoadedInThisBatch);
+				Log.d("debug", "Got #tweets: " + tweetsLoadedInThisBatch.size());
 				
 				if (!addToTop) {
 					aTweets.addAll(tweetsLoadedInThisBatch);
@@ -189,14 +191,14 @@ public class TimelineActivity extends Activity {
 	// Uses since_id
 	private void handlePullToRefresh() {
 		
-		Log.d("debug", "handling pull to refresh");
+		Log.d("debug", "Handling pull to refresh in timeline.");
 		
 		ptrlvTweets.setOnRefreshListener(new OnRefreshListener() {
 			
 			@Override
 			public void onRefresh() {
 				
-				Log.d("debug", "populating pull to refresh");
+				Log.d("debug", "Populating tweets upon pull to refresh.");
 				
 				populateTimeline(TwitterClient.getRequestParameters("since_id", 
 						Long.toString(SINCE_TWEET_ID)), 
@@ -210,13 +212,17 @@ public class TimelineActivity extends Activity {
 	// Uses max_id
 	private void handleTimelineScroll() {
 	
-		Log.d("debug", "handling infinite scroll");
+		Log.d("debug", "Handling infinite scroll in timeline.");
 		ptrlvTweets.setOnScrollListener(new EndlessScrollListener() {
 			
 			@Override
 			public void onLoadMore(int page, int totalItemsCount) {
 				
-				Log.d("debug", "populating infinite scroll");
+				Log.d("debug", "Populating tweets upon infinite scroll.");
+				if (aTweets.isEmpty()) {
+					Log.d("debug", "Timeline hasn't been loaded initially. Skip.");
+					return;
+				}
 				
 				populateTimeline(TwitterClient.getRequestParameters("max_id", 
 						Long.toString(MAX_TWEET_ID)), false /* more tweets will be added at the bottom */);
