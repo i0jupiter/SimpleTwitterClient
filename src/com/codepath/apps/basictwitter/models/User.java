@@ -1,13 +1,17 @@
 package com.codepath.apps.basictwitter.models;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 /**
  * Represents a single user in Twitter land.
@@ -57,7 +61,29 @@ public class User extends Model implements Serializable {
 		}
 		return user;
 	}
-
+	
+	public static User getPersistedUser(User user) {
+		
+		final List<User> fetchedUsers = new Select().from(User.class)
+				.where("uid = ?", user.getUid()).execute();
+		if (fetchedUsers.size() == 1) {
+			return fetchedUsers.get(0);
+		}
+		return null;
+	}
+	
+	public static User getPersistedUserByScreenName(String screenName) {
+		
+		Log.d("debug", "Fetching user by screen name: " + screenName);
+		final List<User> fetchedUsers = new Select().from(User.class)
+				.where("screenName = ?", screenName).execute();
+		if (fetchedUsers.size() == 1) {
+			Log.d("debug", "Fetched user: " + fetchedUsers.get(0));
+			return fetchedUsers.get(0);
+		}
+		return null;
+	}
+	
 	public long getUid() {
 		return uid;
 	}

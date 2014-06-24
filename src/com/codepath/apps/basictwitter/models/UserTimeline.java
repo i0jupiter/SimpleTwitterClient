@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 /**
  * Represents a user's timeline in Twitter land.
+ * Currently only has the user.
  * 
  * @author shine
  *
@@ -55,6 +56,7 @@ public class UserTimeline implements Serializable {
 		try {
 			userTimeline = new UserTimeline();
 			userTimeline.user = User.fromJson(jsonObject.getJSONObject("user"));
+			userTimeline.user.save();
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

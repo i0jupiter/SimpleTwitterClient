@@ -21,6 +21,7 @@ public class NetworkUtils {
 		final NetworkInfo activeNetworkInfo = connectivityManager
 				.getActiveNetworkInfo();
 		
+		//return false;
 		return (activeNetworkInfo != null && activeNetworkInfo
 				.isConnectedOrConnecting());
 	}

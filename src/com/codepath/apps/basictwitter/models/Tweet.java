@@ -98,12 +98,18 @@ public class Tweet extends Model implements Serializable {
 				
 				// If a user has already been persisted, persisting them again will
 				// first delete them and cascade the delete to the tweet as well!
-				// So, do NOT re-persist a user.
-				if (!userAlreadyPersisted(tweet.user)) {
+				// So, check if a user is already present and if she is, set it to
+				// the tweet so the tweet can find its user using the right foreign key.
+				final User tempUser = User.getPersistedUser(tweet.user);
+				if (tempUser == null) {
 					Log.d("debug", "Inserting user: " + tweet.user);
 					tweet.user.save();
+				} else {
+					Log.d("Debug", "User already present for tweet ID: " + tweet.getTid());
+					tweet.setUser(tempUser);
 				}
 				Log.d("debug", "Inserting tweet: " + tweet);
+				
 				tweet.save();
 				
 				// Also set the timestamp to relative before returning
@@ -139,6 +145,19 @@ public class Tweet extends Model implements Serializable {
 		return tweet;
 	}
 	
+	public static List<Tweet> fetchPersistedTweets() {
+		
+		final List<Tweet> fetchedTweets = 
+				new Select().from(Tweet.class).execute();
+		for (Tweet tweet : fetchedTweets) {
+			//Log.d("debug", "Fetched tweet: " + tweet);
+			tweet.createdAt = DateTimeUtils.getRelativeTimeofTweet(tweet.getCreatedAt());
+		}
+		
+		Log.d("debug", "# Tweets fetched offline: " + fetchedTweets.size());
+		return fetchedTweets;
+	}
+	
 	public long getTid() {
 		return tid;
 	}
@@ -154,6 +173,10 @@ public class Tweet extends Model implements Serializable {
 	public User getUser() {
 		return user;
 	}
+	
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 	@Override
 	public String toString() {
@@ -161,20 +184,21 @@ public class Tweet extends Model implements Serializable {
 				+ createdAt + ", user=" + user + "]";
 	}
 	
-	private static boolean userAlreadyPersisted(User user) {
-		
-		final List<User> fetchedUsers = new Select().from(User.class)
-				.where("uid = ?", user.getUid()).execute();
-		return fetchedUsers.size() == 1;
-	}
+	/* Private methods */
 	
 	private static void checkTweetsPersisted(ArrayList<Tweet> tweetsExpectedToBePersisted) {
 		
 		final List<User> fetchedUsers = new Select().from(User.class).execute();
 		Log.d("debug", "Fetched users: " + fetchedUsers.size());
+		for (User user : fetchedUsers) {
+			Log.d("debug", "Fetched user: " + user);
+		}
 		
 		final List<Tweet> fetchedTweets = new Select().from(Tweet.class).execute();
 		Log.d("debug", "Fetched tweets: " + fetchedTweets.size());
+		for (Tweet tweet : fetchedTweets) {
+			Log.d("debug", "Fetched tweet: " + tweet);
+		}
 	}
 	
 }

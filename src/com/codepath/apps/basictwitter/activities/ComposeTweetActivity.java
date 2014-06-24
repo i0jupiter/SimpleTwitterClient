@@ -95,7 +95,7 @@ public class ComposeTweetActivity extends Activity {
 
 	private void setupUserAttributes() {
 		
-		currentUser = (User) getIntent().getExtras().get("currentUser");
+		currentUser = User.getPersistedUserByScreenName(TwitterClient.USER_SCREEN_NAME);
 		tvUserName.setText(currentUser.getName());
 		tvUserScreenName.setText("@" + currentUser.getScreenName());
 		final ImageLoader imageLoader = ImageLoader.getInstance();
