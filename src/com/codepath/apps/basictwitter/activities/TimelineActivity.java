@@ -1,7 +1,6 @@
 package com.codepath.apps.basictwitter.activities;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 
@@ -14,7 +13,6 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.activeandroid.query.Select;
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApplication;
 import com.codepath.apps.basictwitter.TwitterClient;
@@ -59,7 +57,10 @@ public class TimelineActivity extends Activity {
 		
 		// Check for Internet availability
 		if (!NetworkUtils.isNetworkAvailable(this)) {
-			Toast.makeText(this, "Please check your network connection.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, 
+					"No Internet connection found. Loading previously cached tweets.", 
+					Toast.LENGTH_LONG).show();
+			populateTimelineOffline();
 			return;
 		}
 		
@@ -93,7 +94,6 @@ public class TimelineActivity extends Activity {
 		
 		final Intent composeTweetIntent = 
 				new Intent(TimelineActivity.this, ComposeTweetActivity.class);
-		composeTweetIntent.putExtra("currentUser", currentUserTimeline.getUser());
 		
 		startActivityForResult(composeTweetIntent, COMPOSE_TWEET_REQUEST_CODE);
 	}
@@ -167,7 +167,6 @@ public class TimelineActivity extends Activity {
 				final ArrayList<Tweet> tweetsLoadedInThisBatch = 
 						Tweet.fromJsonArray(jsonArray);
 				Log.d("debug", "Got #tweets: " + tweetsLoadedInThisBatch.size());
-				//checkTweetsPersisted(tweetsLoadedInThisBatch);
 				
 				if (!addToTop) {
 					aTweets.addAll(tweetsLoadedInThisBatch);
@@ -291,13 +290,11 @@ public class TimelineActivity extends Activity {
 		updatedTweetList.clear();
 	}
 	
-	private void checkTweetsPersisted(ArrayList<Tweet> tweetsExpectedToBePersisted) {
+	private void populateTimelineOffline() {
 		
-		for (Tweet tweet : tweetsExpectedToBePersisted) {
-			
-			final List<Tweet> fetchedTweets = 
-					new Select().from(Tweet.class).where("tid = ?", tweet.getTid()).execute();
-			Log.d("debug", "Fetched tweet: " + fetchedTweets.size() + " " + fetchedTweets.get(0).toString());
-		}
+		Log.d("debug", "Fetching tweets offline");
+		
+		aTweets.clear();
+		aTweets.addAll(Tweet.fetchPersistedTweets());
 	}
 }
