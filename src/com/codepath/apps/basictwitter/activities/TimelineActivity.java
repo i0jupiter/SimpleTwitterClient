@@ -1,6 +1,7 @@
 package com.codepath.apps.basictwitter.activities;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApplication;
 import com.codepath.apps.basictwitter.TwitterClient;
@@ -165,6 +167,7 @@ public class TimelineActivity extends Activity {
 				final ArrayList<Tweet> tweetsLoadedInThisBatch = 
 						Tweet.fromJsonArray(jsonArray);
 				Log.d("debug", "Got #tweets: " + tweetsLoadedInThisBatch.size());
+				//checkTweetsPersisted(tweetsLoadedInThisBatch);
 				
 				if (!addToTop) {
 					aTweets.addAll(tweetsLoadedInThisBatch);
@@ -286,5 +289,15 @@ public class TimelineActivity extends Activity {
 		
 		// Clear the temp list to reduce data held in memory
 		updatedTweetList.clear();
+	}
+	
+	private void checkTweetsPersisted(ArrayList<Tweet> tweetsExpectedToBePersisted) {
+		
+		for (Tweet tweet : tweetsExpectedToBePersisted) {
+			
+			final List<Tweet> fetchedTweets = 
+					new Select().from(Tweet.class).where("tid = ?", tweet.getTid()).execute();
+			Log.d("debug", "Fetched tweet: " + fetchedTweets.size() + " " + fetchedTweets.get(0).toString());
+		}
 	}
 }

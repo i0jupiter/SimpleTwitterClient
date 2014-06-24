@@ -16,10 +16,12 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
  *     
  */
 public class TwitterApplication extends com.activeandroid.app.Application {
+	
 	private static Context context;
 	
     @Override
     public void onCreate() {
+    	
         super.onCreate();
         TwitterApplication.context = this;
         
