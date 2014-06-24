@@ -54,6 +54,7 @@ public class ComposeTweetActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_compose_tweet);
+		// The compose tweet screen of Twitter app doesn't have an ActionBar
 		getActionBar().hide();
 		
 		twitterClient = TwitterApplication.getRestClient();

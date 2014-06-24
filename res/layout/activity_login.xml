@@ -8,14 +8,24 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".LoginActivity" >
 
+    <TextView
+        android:id="@+id/tvLoginIntructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:gravity="left|top"
+        android:text="@string/tvLoginIntructions" />
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
+        android:layout_below="@+id/tvLoginIntructions"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/round_corners_gradient"
         android:onClick="loginToRest"
         android:text="@string/login_label"
-        android:background="@drawable/round_corners_active"
         android:textColor="@android:color/white" />
 
 </RelativeLayout>
