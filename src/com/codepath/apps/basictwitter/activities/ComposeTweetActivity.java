@@ -97,7 +97,7 @@ public class ComposeTweetActivity extends Activity {
 		
 		currentUser = (User) getIntent().getExtras().get("currentUser");
 		tvUserName.setText(currentUser.getName());
-		tvUserScreenName.setText(currentUser.getScreenName());
+		tvUserScreenName.setText("@" + currentUser.getScreenName());
 		final ImageLoader imageLoader = ImageLoader.getInstance();
 		imageLoader.displayImage(currentUser.getProfileImageUrl(), ivProfileImage);
 	}
