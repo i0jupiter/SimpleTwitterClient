@@ -13,6 +13,7 @@ import android.util.Log;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Column.ForeignKeyAction;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.codepath.apps.basictwitter.helpers.DateTimeUtils;
@@ -35,7 +36,7 @@ public class Tweet extends Model implements Serializable {
 	private String text; //tweet text
 	@Column
 	private String createdAt; //tweet creation timestamp
-	@Column
+	@Column(onUpdate = ForeignKeyAction.CASCADE, onDelete = ForeignKeyAction.CASCADE)
 	private User user; // the embedded user in the tweet
 	
 	public Tweet() { 
@@ -73,15 +74,12 @@ public class Tweet extends Model implements Serializable {
 			
 			final Tweet tweet = Tweet.fromJson(tweetJson);
 			if (tweet != null) {
-				tweet.user.save();
-				tweet.save();
 				tweets.add(tweet);
 			}
 		} //for
 		
-		return tweets;
 		// Persist the newly fetched tweets and return them
-		//return persistAndReturnTweets(tweets);
+		return persistAndReturnTweets(tweets);
 	}
 	
 	private static ArrayList<Tweet> persistAndReturnTweets(
@@ -97,15 +95,17 @@ public class Tweet extends Model implements Serializable {
 		ActiveAndroid.beginTransaction();
 		try {
 			for (Tweet tweet : tweetsToBePersisted) {
-				// If the tweet exists, save it to the DB returning it in a list
-				User tempUser = tweet.getUser();
-				//Log.d("debug", "Inserting user: " + tempUser);
-				tempUser.save();
-				//Log.d("debug", "Inserting tweet: " + tweet);
+				
+				// If a user has already been persisted, persisting them again will
+				// first delete them and cascade the delete to the tweet as well!
+				// So, do NOT re-persist a user.
+				if (!userAlreadyPersisted(tweet.user)) {
+					Log.d("debug", "Inserting user: " + tweet.user);
+					tweet.user.save();
+				}
+				Log.d("debug", "Inserting tweet: " + tweet);
 				tweet.save();
-//				final List<Tweet> fetchedTweets = 
-//						new Select().from(Tweet.class).where("tid = ?", tweet.getTid()).execute();
-//				Log.d("debug", "Fetched tweet: " + fetchedTweets.size() + " " + fetchedTweets.get(0).toString());
+				
 				// Also set the timestamp to relative before returning
 				tweet.createdAt = DateTimeUtils.getRelativeTimeofTweet(tweet.getCreatedAt());
 				persistedTweets.add(tweet);
@@ -115,8 +115,11 @@ public class Tweet extends Model implements Serializable {
 			ActiveAndroid.endTransaction();
 		}
 		
-		checkTweetsPersisted(tweetsToBePersisted);
+		// Clear the original list of tweets
 		tweetsToBePersisted.clear();
+		
+		// DEBUG: Check if the tweets have been persisted correctly and return the list
+		checkTweetsPersisted(persistedTweets);
 		return persistedTweets;
 	}
 	
@@ -158,18 +161,20 @@ public class Tweet extends Model implements Serializable {
 				+ createdAt + ", user=" + user + "]";
 	}
 	
+	private static boolean userAlreadyPersisted(User user) {
+		
+		final List<User> fetchedUsers = new Select().from(User.class)
+				.where("uid = ?", user.getUid()).execute();
+		return fetchedUsers.size() == 1;
+	}
+	
 	private static void checkTweetsPersisted(ArrayList<Tweet> tweetsExpectedToBePersisted) {
 		
-		for (Tweet tweet : tweetsExpectedToBePersisted) {
-			
-			final List<Tweet> fetchedTweets = 
-					new Select().from(Tweet.class).where("tid = ?", tweet.getTid()).execute();
-			Log.d("debug", "Fetched tweet: " + fetchedTweets.size() + " " + fetchedTweets.get(0).toString());
-			
-//			final List<User> fetchedUsers = 
-//					new Select().from(User.class).where("uid = ?", tweet.getUser().getUid()).execute();
-//			Log.d("debug", "Fetched user: " + fetchedUsers.size() + " " + fetchedUsers.get(0).toString());
-		}
+		final List<User> fetchedUsers = new Select().from(User.class).execute();
+		Log.d("debug", "Fetched users: " + fetchedUsers.size());
+		
+		final List<Tweet> fetchedTweets = new Select().from(Tweet.class).execute();
+		Log.d("debug", "Fetched tweets: " + fetchedTweets.size());
 	}
 	
 }

@@ -1,17 +1,13 @@
 package com.codepath.apps.basictwitter.models;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
 
 /**
  * Represents a single user in Twitter land.
@@ -29,7 +25,7 @@ public class User extends Model implements Serializable {
 	private long uid;
 	@Column
 	private String name;
-	@Column
+	@Column(index = true)
 	private String screenName;
 	@Column
 	private String profileImageUrl;
@@ -56,11 +52,6 @@ public class User extends Model implements Serializable {
 			user.name = jsonObject.getString("name");
 			user.screenName = jsonObject.getString("screen_name");
 			user.profileImageUrl = jsonObject.getString("profile_image_url");
-//			Log.d("debug", "Inserting user: " + user);
-//			user.save();
-//			final List<User> fetchedUsers = 
-//					new Select().from(User.class).where("uid = ?", user.getUid()).execute();
-//			Log.d("debug", "Fetched user: " + fetchedUsers.size() + " " + fetchedUsers.get(0).toString());
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
