@@ -20,7 +20,9 @@
         android:layout_alignTop="@+id/ivProfileImage"
         android:layout_toRightOf="@+id/ivProfileImage"
         android:layout_marginLeft="5dp"
-        android:text="@string/tvUserNameLabel" />
+        android:text="@string/tvUserNameLabel"
+        android:textStyle="bold"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/tvUserScreenName"
@@ -29,7 +31,9 @@
         android:layout_alignTop="@+id/ivProfileImage"
         android:layout_toRightOf="@+id/tvUserName"
         android:layout_marginLeft="5dp"
-        android:text="@string/tvUserScreenNameLabel" />
+        android:text="@string/tvUserScreenNameLabel"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="13sp"  />
     
     <TextView
         android:id="@+id/tvTweetTimestamp"
@@ -38,7 +42,9 @@
         android:layout_alignTop="@+id/ivProfileImage"
         android:layout_alignParentRight="true"
         android:layout_marginRight="5dp"
-        android:text="@string/tvTweetTimestampLabel" />
+        android:text="@string/tvTweetTimestampLabel"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp" />
     
     <TextView
         android:id="@+id/tvTweetText"

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Basic Twitter</string>
+    <string name="app_name">Twitter</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_photos">Flickr Photos</string>
     <string name="login_label">Connect to Twitter</string>
-    <string name="title_activity_timeline">TimelineActivity</string>
+    <string name="title_activity_timeline">Timeline</string>
     <string name="tvUserNameLabel">User Name</string>
     <string name="tvUserScreenNameLabel">\@handle</string>
     <string name="tvTweetTextLabel">This is the tweet text</string>

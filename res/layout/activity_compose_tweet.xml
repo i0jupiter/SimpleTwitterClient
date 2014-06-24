@@ -21,7 +21,9 @@
         android:layout_alignTop="@+id/ivProfileImage"
         android:layout_toRightOf="@+id/ivProfileImage"
         android:layout_marginLeft="5dp"
-        android:text="@string/tvUserNameLabel" />
+        android:text="@string/tvUserNameLabel"
+        android:textStyle="bold"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/tvUserScreenName"
@@ -30,7 +32,9 @@
         android:layout_below="@+id/tvUserName"
         android:layout_alignLeft="@+id/tvUserName"
         android:layout_marginTop="2dp"
-        android:text="@string/tvUserScreenNameLabel" />
+        android:text="@string/tvUserScreenNameLabel"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="13sp" />
 
     <Button
         android:id="@+id/btnUpdateStatus"
@@ -41,7 +45,9 @@
         android:layout_marginRight="10dp"
         android:text="@string/btnUpdateStatusLabel" 
         android:enabled="false" 
-        android:onClick="onUpdateStatus" />
+        android:onClick="onUpdateStatus"
+        android:textColor="@android:color/white"
+        android:background="@drawable/round_corners_active" />
     
     <TextView
         android:id="@+id/tvTweetCharCount"
@@ -52,19 +58,23 @@
         android:layout_marginEnd="10dp"
         android:ems="10"
         android:gravity="right"
-        android:hint="@string/tvTweetCharCountLabel" />
+        android:hint="@string/tvTweetCharCountLabel"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="13sp" />
     
     <EditText
         android:id="@+id/etUpdateStatus"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignLeft="@+id/ivProfileImage"
         android:layout_alignRight="@+id/btnUpdateStatus"
         android:layout_below="@+id/btnUpdateStatus"
         android:layout_marginTop="10dp"
         android:ems="10"
         android:inputType="textMultiLine"
-        android:hint="@string/etUpdateStatusLabel" >
+        android:gravity="left|top"
+        android:hint="@string/etUpdateStatusLabel"
+        android:textSize="15sp" >
 
         <requestFocus />
     </EditText>

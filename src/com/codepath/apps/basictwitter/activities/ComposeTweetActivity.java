@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -39,6 +40,8 @@ public class ComposeTweetActivity extends Activity {
 	private TwitterClient twitterClient;
 	
 	private Button btnUpdateStatus;
+	private Drawable roundCornersActive;
+	private Drawable roundCornersInctive;
 	private EditText etUpdateStatus;
 	private ImageView ivProfileImage;
 	private TextView tvTweetCharCount;
@@ -51,6 +54,7 @@ public class ComposeTweetActivity extends Activity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_compose_tweet);
+		getActionBar().hide();
 		
 		twitterClient = TwitterApplication.getRestClient();
 		setupViews();
@@ -84,6 +88,9 @@ public class ComposeTweetActivity extends Activity {
 	
 	private void setupViews() {
 		
+		roundCornersActive = getResources().getDrawable(R.drawable.round_corners_active);
+		roundCornersInctive = getResources().getDrawable(R.drawable.round_corners_deactivated);
+		
 		btnUpdateStatus = (Button) findViewById(R.id.btnUpdateStatus);
 		etUpdateStatus = (EditText) findViewById(R.id.etUpdateStatus);
 		ivProfileImage = (ImageView) findViewById(R.id.ivProfileImage);
@@ -110,6 +117,8 @@ public class ComposeTweetActivity extends Activity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				
+				// XXX Using deprecated methods is bad but will live with it for now.
+				btnUpdateStatus.setBackgroundDrawable(roundCornersActive);
 				btnUpdateStatus.setEnabled(true);
 				final int remainingChars = MAX_CHAR_LIMIT - s.length(); 
 				tvTweetCharCount.setText(Integer.toString(remainingChars));
@@ -117,6 +126,7 @@ public class ComposeTweetActivity extends Activity {
 					tvTweetCharCount.setTextColor(Color.RED);
 				}
 				if (remainingChars < 1) {
+					btnUpdateStatus.setBackgroundDrawable(roundCornersInctive);
 					btnUpdateStatus.setEnabled(false);
 				}
 			}
