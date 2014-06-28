@@ -156,13 +156,13 @@ public class ComposeTweetActivity extends Activity {
 			@Override
 			public void onSuccess(JSONObject jsonObject) {
 				
-				// Set result and close this activity
-				setResult(RESULT_OK, statusUpdatedIntent);
-				
 				Log.d("debug", "Tweet posted successfully: " + newTweet);
 				Toast.makeText(getApplicationContext(), 
 						"Tweet sent successfully!", Toast.LENGTH_SHORT).show();
 				super.onSuccess(jsonObject);
+				
+				// Set result and close this activity
+				setResult(RESULT_OK, statusUpdatedIntent);
 				
 				// Close this activity
 				finish();
@@ -171,19 +171,19 @@ public class ComposeTweetActivity extends Activity {
 			@Override
 			public void onFailure(Throwable t, String s) {
 				
-				// If the tweet couldn't be posted, don't pass it to TimelineActivity
-				setResult(RESULT_CANCELED, statusUpdatedIntent);
-				
 				Log.d("debug", "Tweet post failed: " + newTweet);
 				Toast.makeText(getApplicationContext(), 
 						"Tweet could not be sent!", Toast.LENGTH_SHORT).show();
 				super.onFailure(t, s);
 				
+				// If the tweet couldn't be posted, don't pass it to TimelineActivity
+				setResult(RESULT_CANCELED, statusUpdatedIntent);
+				
 				// Close this activity
 				finish();
 			}
 		
-		}, TwitterClient.getRequestParameters("status", newTweet));
+		}, "status", newTweet);
 	}
 
 }

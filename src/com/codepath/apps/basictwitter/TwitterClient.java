@@ -35,9 +35,10 @@ public class TwitterClient extends OAuthBaseClient {
     }
     
     public void getCurrentUserTimeline(AsyncHttpResponseHandler handler, 
-    		RequestParams requestParams) {
+    		String... args) {
     	
     	final String apiUrl = getApiUrl("statuses/user_timeline.json");
+    	final RequestParams requestParams = getRequestParameters(args);
     	
     	Log.d("debug", "GET URL: " + apiUrl);
     	Log.d("debug", "params: " + requestParams.toString());
@@ -47,9 +48,10 @@ public class TwitterClient extends OAuthBaseClient {
     
     // Get the tweets on the user's timeline based on the different query parameters provided. 
     public void getHomeTimeline(AsyncHttpResponseHandler handler, 
-    		RequestParams requestParams) {
+    		String... args) {
     	
     	final String apiUrl = getApiUrl("statuses/home_timeline.json");
+    	final RequestParams requestParams = getRequestParameters(args);
     	
     	Log.d("debug", "GET URL: " + apiUrl);
     	Log.d("debug", "params: " + requestParams.toString());
@@ -59,9 +61,11 @@ public class TwitterClient extends OAuthBaseClient {
 
     // Post a new tweet to Twitter
     public void updateStatus(AsyncHttpResponseHandler handler, 
-    		RequestParams requestParams) {
+    		String... args) {
     	
     	final String apiUrl = getApiUrl("statuses/update.json");
+    	final RequestParams requestParams = getRequestParameters(args);
+    	
     	if (requestParams == null) {
     		Log.d("warn", "No text received in status. Ignoring.");
     		return;
@@ -73,7 +77,7 @@ public class TwitterClient extends OAuthBaseClient {
     	client.post(apiUrl, requestParams, handler);
     }
     
-    public static RequestParams getRequestParameters(String... args) {
+    private static RequestParams getRequestParameters(String... args) {
 		
 		// Parameters should always come in key-value pairs
 		if ((args.length % 2) != 0) {
