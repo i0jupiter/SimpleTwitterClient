@@ -15,5 +15,7 @@
     <string name="tvTweetCharCountLabel">140</string>
     <string name="etUpdateStatusLabel">What\'s happening?</string>
     <string name="tvLoginIntructions">"Please click the button below to authorize your app to connect with Twitter.</string>
+    <string name="miProfileView">My Profile</string>
+    <string name="title_activity_profile">Profile</string>
 
 </resources>

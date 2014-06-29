@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     
     <item
         android:id="@+id/miCompose"
-        android:icon="@drawable/ic_action_compose"
+        android:icon="@drawable/ic_action_compose_tweet"
         android:onClick="onComposeTweet"
         android:title="@string/miComposeTweet"
-        app:showAsAction="always">
+        android:showAsAction="always">
+    </item>
+    
+    <item
+        android:id="@+id/miProfileView"
+        android:icon="@drawable/ic_action_profile_view"
+        android:onClick="onProfileView"
+        android:title="@string/miProfileView"
+        android:showAsAction="always">
     </item>
 
 </menu>

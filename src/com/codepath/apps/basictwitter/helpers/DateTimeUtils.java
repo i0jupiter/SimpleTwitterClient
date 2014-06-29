@@ -69,8 +69,13 @@ public class DateTimeUtils {
 		
 		// If the regex couldn't be parsed, make the relative timestamp manually
 		// Should never happen though
+		Log.d("debug", "Relative date didn't match pattern: " + fullRelativeDate);
 		final String[] info = fullRelativeDate.split("\\s");
-		sb.append(info[0].toString()).append(info[1].toString().substring(0, 1));
+		if (info.length > 2) {
+			sb.append(info[0].toString()).append(info[1].toString().substring(0, 1));
+		} else {
+			sb.append(info[0].toString());
+		}
 		return sb.toString();
 	}
 }

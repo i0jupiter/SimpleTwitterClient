@@ -238,7 +238,7 @@ public abstract class TweetListFragment extends Fragment {
 				
 				Log.d("debug", "Populating tweets upon infinite scroll.");
 				if (aTweets.isEmpty()) {
-					Log.d("debug", "Timeline hasn't been loaded initially. Skip.");
+					Log.d("debug", "Timeline hasn't been loaded initially. Skipping.");
 					return;
 				}
 				

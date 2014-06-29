@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.fragments.HomeTimelineFragment;
 import com.codepath.apps.basictwitter.fragments.MentionsTimelineFragment;
-import com.codepath.apps.basictwitter.fragments.TweetListFragment;
 import com.codepath.apps.basictwitter.listeners.FragmentTabListener;
 
 /**
@@ -24,11 +23,12 @@ import com.codepath.apps.basictwitter.listeners.FragmentTabListener;
 public class TimelineActivity extends FragmentActivity {
 
 	private final int COMPOSE_TWEET_REQUEST_CODE = 100;
+	private final int PROFILE_VIEW_REQUEST_CODE = 200;
 	
-	private ActionBar actionBar;
-	private Tab homeTab;
-	private Tab mentionsTab;
-	private TweetListFragment tweetListFragment;
+	private final String HOME_FRAGMENT_TAB_TAG = "Home";
+	private final String MENTIONS_FRAGMENT_TAB_TAG = "Mentions";
+	
+	private HomeTimelineFragment tweetListFragment;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +36,8 @@ public class TimelineActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_timeline);
 		setupTabs();
-		
-		tweetListFragment = 
-				(TweetListFragment) getSupportFragmentManager().findFragmentByTag("Home");
-	}
-
+	}		
+	
 	// Create the action bar for this activity
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -58,9 +55,22 @@ public class TimelineActivity extends FragmentActivity {
 		startActivityForResult(composeTweetIntent, COMPOSE_TWEET_REQUEST_CODE);
 	}
 	
+	// Show ProfileViewActivity on click of ProfileView in ActionBar
+	public void onProfileView(MenuItem mi) {
+		
+		final Intent profileViewIntent = 
+				new Intent(TimelineActivity.this, ProfileActivity.class);
+		startActivity(profileViewIntent);
+	}
+	
 	// If a new tweet was successfully composed, update the timeline.
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+		// XXX For some reason, getting this fragment right after setupTabs() in onCreate()
+		// throws NPE. Figure out why.
+		tweetListFragment = (HomeTimelineFragment) getSupportFragmentManager()
+				.findFragmentByTag(HOME_FRAGMENT_TAB_TAG);
 		
 		Log.d("debug", "in onActivityResult: resultCode: " + requestCode + " resultCode: " + resultCode);
 		
@@ -76,24 +86,24 @@ public class TimelineActivity extends FragmentActivity {
 	
 	private void setupTabs() {
 		
-		actionBar = getActionBar();
+		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowTitleEnabled(true);
 
-		homeTab = actionBar
+		final Tab homeTab = actionBar
 		    .newTab()
 		    .setText("Home")
 		    .setTabListener(new FragmentTabListener<HomeTimelineFragment>(R.id.flContainer, this,
-                        "Home", HomeTimelineFragment.class));
+		    		HOME_FRAGMENT_TAB_TAG, HomeTimelineFragment.class));
 
 		actionBar.addTab(homeTab);
 		actionBar.selectTab(homeTab);
 
-		mentionsTab = actionBar
+		final Tab mentionsTab = actionBar
 		    .newTab()
 		    .setText("Mentions")
 		    .setTabListener(new FragmentTabListener<MentionsTimelineFragment>(R.id.flContainer, this,
-                        "Mentions", MentionsTimelineFragment.class));
+		    		MENTIONS_FRAGMENT_TAB_TAG, MentionsTimelineFragment.class));
 		actionBar.addTab(mentionsTab);
 	}
 }
