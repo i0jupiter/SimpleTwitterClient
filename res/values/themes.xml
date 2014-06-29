@@ -2,7 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- the theme applied to the application or activity -->
     <style name="TimelineActionBarTheme"
-           parent="@android:style/Theme.Holo.Light.DarkActionBar">
+           parent="@android:style/Theme.Base.AppCompat.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/TimelineActionBar</item>
     </style>
     

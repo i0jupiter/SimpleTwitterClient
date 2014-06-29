@@ -5,9 +5,9 @@
     <item
         android:id="@+id/miCompose"
         android:icon="@drawable/ic_action_compose"
-        android:showAsAction="always"
         android:onClick="onComposeTweet"
-        android:title="@string/miComposeTweet">
+        android:title="@string/miComposeTweet"
+        app:showAsAction="always">
     </item>
 
 </menu>

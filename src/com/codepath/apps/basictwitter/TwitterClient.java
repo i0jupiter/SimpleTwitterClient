@@ -77,6 +77,19 @@ public class TwitterClient extends OAuthBaseClient {
     	client.post(apiUrl, requestParams, handler);
     }
     
+    // Get the current user's 'mentions' based on the different query parameters provided. 
+    public void getMentionsTimeline(AsyncHttpResponseHandler handler, 
+    		String... args) {
+    	
+    	final String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+    	final RequestParams requestParams = getRequestParameters(args);
+    	
+    	Log.d("debug", "GET URL: " + apiUrl);
+    	Log.d("debug", "params: " + requestParams.toString());
+    	
+    	client.get(apiUrl, requestParams, handler);
+    }
+    
     private static RequestParams getRequestParameters(String... args) {
 		
 		// Parameters should always come in key-value pairs

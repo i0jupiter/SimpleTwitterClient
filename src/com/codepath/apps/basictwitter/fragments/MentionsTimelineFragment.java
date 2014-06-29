@@ -12,8 +12,8 @@ import com.codepath.apps.basictwitter.helpers.NetworkUtils;
 import com.codepath.apps.basictwitter.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-public class HomeTimelineFragment extends TweetListFragment {
-
+public class MentionsTimelineFragment extends TweetListFragment {
+	
 	private long MAX_TWEET_ID = Long.MAX_VALUE;
 	private long SINCE_TWEET_ID = 1L;
 	
@@ -30,13 +30,13 @@ public class HomeTimelineFragment extends TweetListFragment {
 		super.onActivityCreated(savedInstanceState);
 		
 		// Check for Internet availability
-		if (!NetworkUtils.isNetworkAvailable(getActivity())) {
-			Toast.makeText(getActivity().getApplicationContext(), 
-					"No Internet connection found. Loading previously cached tweets.", 
-					Toast.LENGTH_LONG).show();
-			populateTimelineOffline();
-			return;
-		}
+//		if (!NetworkUtils.isNetworkAvailable(getActivity())) {
+//			Toast.makeText(getActivity().getApplicationContext(), 
+//					"No Internet connection found. Loading previously cached tweets.", 
+//					Toast.LENGTH_LONG).show();
+//			populateTimelineOffline();
+//			return;
+//		}
 		
 		// Clear the adapter before loading any tweets
 		aTweets.clear();
@@ -47,7 +47,7 @@ public class HomeTimelineFragment extends TweetListFragment {
 	@Override
 	public void refreshTimeline() {
 		
-		Log.d("debug", "Populating tweets upon pull to refresh: " + SINCE_TWEET_ID);
+		Log.d("debug", "Populating mentions upon pull to refresh: " + SINCE_TWEET_ID);
 		populateTimeline(true /* add new tweets to top */,
 				"since_id", Long.toString(SINCE_TWEET_ID));
 	}
@@ -55,29 +55,21 @@ public class HomeTimelineFragment extends TweetListFragment {
 	@Override
 	public void scrollTimeline() {
 		
-		Log.d("debug", "Populating more tweets upon infinite scroll: " + MAX_TWEET_ID);
+		Log.d("debug", "Populating more mentions upon infinite scroll: " + MAX_TWEET_ID);
 		populateTimeline(false /* more tweets will be added at the bottom */,
 				"max_id", Long.toString(MAX_TWEET_ID));
 	}
 	
-	/* Private methods */
 	
-	// Get persisted tweets in DB
-	private void populateTimelineOffline() {
-		
-		Log.d("debug", "Fetching tweets offline");
-		
-		aTweets.clear();
-		aTweets.addAll(Tweet.fetchPersistedTweets());
-	}
+	/* Private methods */
 
-	// Get the current user's tweet timeline
+	// Get the current user's 'mentions' timeline
 	private void populateTimeline(final boolean addToTop, String... args) {
 
-	    Log.d("debug", "Populating timeline with params: " + args 
+	    Log.d("debug", "Populating mentions timeline with params: " + args 
 	    		+ " and adding tweets at the " + (addToTop == true ? "top." : "bottom."));
 
-		twitterClient.getHomeTimeline(new JsonHttpResponseHandler() {
+		twitterClient.getMentionsTimeline(new JsonHttpResponseHandler() {
 
 			@Override
 			public void onSuccess(int statusCode, JSONArray jsonArray) {
@@ -85,7 +77,7 @@ public class HomeTimelineFragment extends TweetListFragment {
 				super.onSuccess(jsonArray);
 				final ArrayList<Tweet> tweetsLoadedInThisBatch = 
 						Tweet.fromJsonArray(jsonArray);
-				Log.d("debug", "Got #tweets: " + tweetsLoadedInThisBatch.size());
+				Log.d("debug", "Got #mentions: " + tweetsLoadedInThisBatch.size());
 
 				if (!addToTop) {
 					aTweets.addAll(tweetsLoadedInThisBatch);
@@ -107,5 +99,4 @@ public class HomeTimelineFragment extends TweetListFragment {
 			}
 		}, args);
 	}
-	
 }
