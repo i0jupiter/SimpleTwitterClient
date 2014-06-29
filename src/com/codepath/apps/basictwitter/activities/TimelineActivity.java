@@ -37,9 +37,8 @@ public class TimelineActivity extends FragmentActivity {
 		setContentView(R.layout.activity_timeline);
 		setupTabs();
 		
-//		//actionBar.getTabAt(0).getCustomView().refr
-//		tweetListFragment = (TweetListFragment) getSupportFragmentManager()
-//					.findFragmentById(R.id.);
+		tweetListFragment = 
+				(TweetListFragment) getSupportFragmentManager().findFragmentByTag("Home");
 	}
 
 	// Create the action bar for this activity
@@ -68,7 +67,7 @@ public class TimelineActivity extends FragmentActivity {
 		if (resultCode == RESULT_OK && requestCode == COMPOSE_TWEET_REQUEST_CODE) {
 			
 			Log.d("debug", "Trying to refresh timeline after composing tweet.");
-			//tweetListFragment.refreshTimeline();
+			tweetListFragment.refreshTimeline();
 		}
 	}
 	
@@ -84,7 +83,6 @@ public class TimelineActivity extends FragmentActivity {
 		homeTab = actionBar
 		    .newTab()
 		    .setText("Home")
-		    .setTag("HomeTimelineFragment")
 		    .setTabListener(new FragmentTabListener<HomeTimelineFragment>(R.id.flContainer, this,
                         "Home", HomeTimelineFragment.class));
 
@@ -94,7 +92,6 @@ public class TimelineActivity extends FragmentActivity {
 		mentionsTab = actionBar
 		    .newTab()
 		    .setText("Mentions")
-		    .setTag("MentionsTimelineFragment")
 		    .setTabListener(new FragmentTabListener<MentionsTimelineFragment>(R.id.flContainer, this,
                         "Mentions", MentionsTimelineFragment.class));
 		actionBar.addTab(mentionsTab);

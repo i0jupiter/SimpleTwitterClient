@@ -18,7 +18,7 @@
     <!-- ActionBar tab styles -->
     <style name="TimelineActionBarTabs"
            parent="@android:style/Widget.ActionBar.TabView">
-        <item name="android:background">@drawable/actionbar_tab_indicator</item>
+        <item name="android:background">#f5f5f0</item>
     </style>
     
     <style name="TimelineActionBarTabText"
