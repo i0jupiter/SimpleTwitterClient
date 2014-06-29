@@ -12,7 +12,7 @@
     <!-- ActionBar styles -->
     <style name="TimelineActionBar"
            parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">#1e90ff</item>
+        <item name="android:background">#4099FF</item>
     </style>
     
     <!-- ActionBar tab styles -->
@@ -23,6 +23,6 @@
     
     <style name="TimelineActionBarTabText"
            parent="@style/Widget.AppCompat.ActionBar.TabText">
-        <item name="android:textColor">#1e90ff</item>
+        <item name="android:textColor">#4099FF</item>
     </style>
 </resources>

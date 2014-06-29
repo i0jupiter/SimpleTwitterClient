@@ -23,7 +23,6 @@ import com.codepath.apps.basictwitter.listeners.FragmentTabListener;
 public class TimelineActivity extends FragmentActivity {
 
 	private final int COMPOSE_TWEET_REQUEST_CODE = 100;
-	private final int PROFILE_VIEW_REQUEST_CODE = 200;
 	
 	private final String HOME_FRAGMENT_TAB_TAG = "Home";
 	private final String MENTIONS_FRAGMENT_TAB_TAG = "Mentions";

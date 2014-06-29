@@ -21,7 +21,6 @@ public class HomeTimelineFragment extends TweetListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
-		
 	}
 	
 	@Override
@@ -44,35 +43,9 @@ public class HomeTimelineFragment extends TweetListFragment {
 				"since_id", "1");
 	}
 	
-	@Override
-	public void refreshTimeline() {
-		
-		Log.d("debug", "Populating tweets upon pull to refresh: " + SINCE_TWEET_ID);
-		populateTimeline(true /* add new tweets to top */,
-				"since_id", Long.toString(SINCE_TWEET_ID));
-	}
-	
-	@Override
-	public void scrollTimeline() {
-		
-		Log.d("debug", "Populating more tweets upon infinite scroll: " + MAX_TWEET_ID);
-		populateTimeline(false /* more tweets will be added at the bottom */,
-				"max_id", Long.toString(MAX_TWEET_ID));
-	}
-	
-	/* Private methods */
-	
-	// Get persisted tweets in DB
-	private void populateTimelineOffline() {
-		
-		Log.d("debug", "Fetching tweets offline");
-		
-		aTweets.clear();
-		aTweets.addAll(Tweet.fetchPersistedTweets());
-	}
-
 	// Get the current user's tweet timeline
-	private void populateTimeline(final boolean addToTop, String... args) {
+	@Override
+	public void populateTimeline(final boolean addToTop, String... args) {
 
 	    Log.d("debug", "Populating timeline with params: " + args 
 	    		+ " and adding tweets at the " + (addToTop == true ? "top." : "bottom."));
@@ -108,4 +81,32 @@ public class HomeTimelineFragment extends TweetListFragment {
 		}, args);
 	}
 	
+	@Override
+	public void refreshTimeline() {
+		
+		Log.d("debug", "Populating tweets upon pull to refresh: " + SINCE_TWEET_ID);
+		populateTimeline(true /* add new tweets to top */,
+				"since_id", Long.toString(SINCE_TWEET_ID));
+	}
+	
+	@Override
+	public void scrollTimeline() {
+		
+		Log.d("debug", "Populating more tweets upon infinite scroll: " + MAX_TWEET_ID);
+		populateTimeline(false /* more tweets will be added at the bottom */,
+				"max_id", Long.toString(MAX_TWEET_ID));
+	}
+	
+	
+	/* Private methods */
+	
+	// Get persisted tweets in DB
+	private void populateTimelineOffline() {
+		
+		Log.d("debug", "Fetching tweets offline");
+		
+		aTweets.clear();
+		aTweets.addAll(Tweet.fetchPersistedTweets());
+	}
+
 }

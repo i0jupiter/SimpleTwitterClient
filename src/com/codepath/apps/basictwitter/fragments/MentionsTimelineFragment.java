@@ -21,7 +21,6 @@ public class MentionsTimelineFragment extends TweetListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
-		
 	}
 	
 	@Override
@@ -44,27 +43,9 @@ public class MentionsTimelineFragment extends TweetListFragment {
 				"since_id", "1");
 	}
 	
-	@Override
-	public void refreshTimeline() {
-		
-		Log.d("debug", "Populating mentions upon pull to refresh: " + SINCE_TWEET_ID);
-		populateTimeline(true /* add new tweets to top */,
-				"since_id", Long.toString(SINCE_TWEET_ID));
-	}
-	
-	@Override
-	public void scrollTimeline() {
-		
-		Log.d("debug", "Populating more mentions upon infinite scroll: " + MAX_TWEET_ID);
-		populateTimeline(false /* more tweets will be added at the bottom */,
-				"max_id", Long.toString(MAX_TWEET_ID));
-	}
-	
-	
-	/* Private methods */
-
 	// Get the current user's 'mentions' timeline
-	private void populateTimeline(final boolean addToTop, String... args) {
+	@Override
+	public void populateTimeline(final boolean addToTop, String... args) {
 
 	    Log.d("debug", "Populating mentions timeline with params: " + args 
 	    		+ " and adding tweets at the " + (addToTop == true ? "top." : "bottom."));
@@ -98,5 +79,21 @@ public class MentionsTimelineFragment extends TweetListFragment {
 				Log.d("debug", s);
 			}
 		}, args);
+	}
+	
+	@Override
+	public void refreshTimeline() {
+		
+		Log.d("debug", "Populating mentions upon pull to refresh: " + SINCE_TWEET_ID);
+		populateTimeline(true /* add new tweets to top */,
+				"since_id", Long.toString(SINCE_TWEET_ID));
+	}
+	
+	@Override
+	public void scrollTimeline() {
+		
+		Log.d("debug", "Populating more mentions upon infinite scroll: " + MAX_TWEET_ID);
+		populateTimeline(false /* more tweets will be added at the bottom */,
+				"max_id", Long.toString(MAX_TWEET_ID));
 	}
 }

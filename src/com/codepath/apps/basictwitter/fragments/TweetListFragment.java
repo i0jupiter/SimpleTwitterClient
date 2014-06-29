@@ -57,8 +57,6 @@ public abstract class TweetListFragment extends Fragment {
 			// to be shown on the different screens in this app
 			getCurrentUserTimeline("screen_name", TwitterClient.USER_SCREEN_NAME, "count", "1");
 		}
-		
-		Log.d("debug", "Fragment created.");
 	}
 	
 	@Override
@@ -68,8 +66,6 @@ public abstract class TweetListFragment extends Fragment {
 		final View view = inflater.inflate(R.layout.fragment_tweet_list, container, false);
 		ptrlvTweets = (PullToRefreshListView) view.findViewById(R.id.ptrlvTweets);
 		ptrlvTweets.setAdapter(aTweets);
-		
-		Log.d("debug", "Fragment view created.");
 		
 		return view;
 	}
@@ -86,6 +82,11 @@ public abstract class TweetListFragment extends Fragment {
 	}
 	
 	/**
+	 * Populate timeline initially
+	 */
+	public abstract void populateTimeline(boolean top, String... args);
+	
+	/**
 	 * Refresh the timeline on pull-to-refresh and compose tweet
 	 */
 	public abstract void refreshTimeline();
@@ -95,8 +96,51 @@ public abstract class TweetListFragment extends Fragment {
 	 */
 	public abstract void scrollTimeline();
 	
+	/**
+	 * Pull down to get the latest tweets
+	 * Uses since_id
+	 */
+	protected void handlePullToRefresh() {
+		
+		Log.d("debug", "Handling pull to refresh in timeline.");
+		
+		ptrlvTweets.setOnRefreshListener(new OnRefreshListener() {
+			
+			@Override
+			public void onRefresh() {
+				
+				// The subclasses should provide their own implementation to
+				// fetch the latest data on pull-to-refresh in timeline
+				refreshTimeline();
+				ptrlvTweets.onRefreshComplete();
+			}
+		});
+	}
+			
+	/**
+	 * Infinite scroll to load more tweets from the past
+	 * Uses max_id
+	 */
+	protected void handleTimelineScroll() {
 	
-	/* Protected methods */
+		Log.d("debug", "Handling infinite scroll in timeline.");
+		ptrlvTweets.setOnScrollListener(new EndlessScrollListener() {
+			
+			@Override
+			public void onLoadMore(int page, int totalItemsCount) {
+				
+				Log.d("debug", "Populating tweets upon infinite scroll.");
+				if (aTweets.isEmpty()) {
+					Log.d("debug", "Timeline hasn't been loaded initially. Skipping.");
+					return;
+				}
+				
+				// The subclasses should provide their own implementation to
+				// populate the timeline on infinite scroll
+				scrollTimeline();
+			}
+		});
+	}
 	
 	/** 
 	 * Determine the max_id so that the future infinite-scroll queries can be optimized.
@@ -177,15 +221,12 @@ public abstract class TweetListFragment extends Fragment {
 		updatedTweetList.clear();
 	}
 	
-	
-	/* Private methods */
-	
-	// Get the current user's timeline
-	private void getCurrentUserTimeline(String... args) {
+	// Get the a given user's timeline
+	protected void getCurrentUserTimeline(String... args) {
 		
-		Log.d("debug", "Getting current user's timeline with params: " + args);
+		Log.d("debug", "Getting user's timeline with params: " + args);
 		
-		twitterClient.getCurrentUserTimeline(new JsonHttpResponseHandler() {
+		twitterClient.getUserTimeline(new JsonHttpResponseHandler() {
 
 			@Override
 			public void onSuccess(int statusCode, JSONArray jsonArray) {
@@ -193,7 +234,7 @@ public abstract class TweetListFragment extends Fragment {
 				super.onSuccess(jsonArray);
 				final UserTimeline currentUserTimeline = 
 						UserTimeline.fromJsonArray(jsonArray).get(0);
-				Log.d("debug", "Got current user's timeline successfully: " 
+				Log.d("debug", "Got user's timeline successfully: " 
 						+ currentUserTimeline.getUser().toString());
 			}
 
@@ -205,48 +246,6 @@ public abstract class TweetListFragment extends Fragment {
 				Log.d("debug", s);
 			}
 		}, args);
-	}
-	
-	// Pull down to get the latest tweets
-	// Uses since_id
-	private void handlePullToRefresh() {
-		
-		Log.d("debug", "Handling pull to refresh in timeline.");
-		
-		ptrlvTweets.setOnRefreshListener(new OnRefreshListener() {
-			
-			@Override
-			public void onRefresh() {
-				
-				// The subclasses should provide their own implementation to
-				// fetch the latest data on pull-to-refresh in timeline
-				refreshTimeline();
-				ptrlvTweets.onRefreshComplete();
-			}
-		});
-	}
-		
-	// Infinite scroll to load more tweets from the past
-	// Uses max_id
-	private void handleTimelineScroll() {
-	
-		Log.d("debug", "Handling infinite scroll in timeline.");
-		ptrlvTweets.setOnScrollListener(new EndlessScrollListener() {
-			
-			@Override
-			public void onLoadMore(int page, int totalItemsCount) {
-				
-				Log.d("debug", "Populating tweets upon infinite scroll.");
-				if (aTweets.isEmpty()) {
-					Log.d("debug", "Timeline hasn't been loaded initially. Skipping.");
-					return;
-				}
-				
-				// The subclasses should provide their own implementation to
-				// populate the timeline on infinite scroll
-				scrollTimeline();
-			}
-		});
 	}
 	
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp">
+        
+        	<ImageView
+		        android:id="@+id/ivProfileImage"
+		        android:layout_width="50dp"
+		        android:layout_height="50dp"
+		        android:layout_alignParentLeft="true"
+		        android:layout_alignParentTop="true"
+		        android:layout_marginTop="5dp"
+		        android:src="@android:drawable/screen_background_light_transparent" />
+        
+        	<TextView
+		        android:id="@+id/tvUserName"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignTop="@+id/ivProfileImage"
+		        android:layout_toRightOf="@+id/ivProfileImage"
+		        android:layout_marginLeft="5dp"
+		        android:text="@string/tvUserNameLabel"
+		        android:textSize="16sp"
+		        android:textStyle="bold" />
+        
+        	<TextView
+		        android:id="@+id/tvUserDescription"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/tvUserName"
+		        android:layout_toRightOf="@+id/ivProfileImage"
+		        android:layout_marginTop="5dp"
+		        android:layout_alignLeft="@+id/tvUserName"
+		        android:text="@string/tvUserDescriptionLabel"
+		        android:textColor="@android:color/darker_gray"
+		        android:textSize="13sp"  />
+        
+    </RelativeLayout>
+    
+    <LinearLayout
+        android:id="@+id/llCounts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlHeader"
+        android:layout_alignLeft="@+id/rlHeader"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
+        
+        <TextView 
+            android:id="@+id/tvFollowers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tvFollowersLabel" />
+        
+        <TextView 
+            android:id="@+id/tvFollowing"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="@string/tvFollowingLabel" />
+        
+    </LinearLayout>
+    
+    <FrameLayout
+        android:id="@+id/flContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/llCounts"
+        android:layout_alignLeft="@+id/rlHeader"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" 
+        android:layout_marginTop="10dp">
+    </FrameLayout>
+
+</RelativeLayout>

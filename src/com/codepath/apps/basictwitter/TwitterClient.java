@@ -34,7 +34,8 @@ public class TwitterClient extends OAuthBaseClient {
         super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
     }
     
-    public void getCurrentUserTimeline(AsyncHttpResponseHandler handler, 
+    // Get the timeline of a user
+    public void getUserTimeline(AsyncHttpResponseHandler handler, 
     		String... args) {
     	
     	final String apiUrl = getApiUrl("statuses/user_timeline.json");
@@ -88,6 +89,16 @@ public class TwitterClient extends OAuthBaseClient {
     	Log.d("debug", "params: " + requestParams.toString());
     	
     	client.get(apiUrl, requestParams, handler);
+    }
+    
+    // Get the current user's info 
+    public void getMyProfile(AsyncHttpResponseHandler handler) {
+    	
+    	final String apiUrl = getApiUrl("account/verify_credentials.json");
+    	
+    	Log.d("debug", "GET URL: " + apiUrl + " with no params.");
+    	
+    	client.get(apiUrl, null, handler);
     }
     
     private static RequestParams getRequestParameters(String... args) {

@@ -17,5 +17,8 @@
     <string name="tvLoginIntructions">"Please click the button below to authorize your app to connect with Twitter.</string>
     <string name="miProfileView">My Profile</string>
     <string name="title_activity_profile">Profile</string>
+    <string name="tvUserDescriptionLabel">About Me</string>
+    <string name="tvFollowersLabel">0 Followers</string>
+    <string name="tvFollowingLabel">0 Following</string>
 
 </resources>
