@@ -12,7 +12,9 @@ import android.view.MenuItem;
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.fragments.HomeTimelineFragment;
 import com.codepath.apps.basictwitter.fragments.MentionsTimelineFragment;
+import com.codepath.apps.basictwitter.fragments.TweetListFragment;
 import com.codepath.apps.basictwitter.listeners.FragmentTabListener;
+import com.codepath.apps.basictwitter.models.User;
 
 /**
  * Main activity showing the Twitter timeline of the user.
@@ -20,7 +22,9 @@ import com.codepath.apps.basictwitter.listeners.FragmentTabListener;
  * @author shine
  *
  */
-public class TimelineActivity extends FragmentActivity {
+public class TimelineActivity 
+		extends FragmentActivity
+		implements TweetListFragment.OnProfileImageClickListener {
 
 	private final int COMPOSE_TWEET_REQUEST_CODE = 100;
 	
@@ -54,11 +58,22 @@ public class TimelineActivity extends FragmentActivity {
 		startActivityForResult(composeTweetIntent, COMPOSE_TWEET_REQUEST_CODE);
 	}
 	
-	// Show ProfileViewActivity on click of ProfileView in ActionBar
+	// Show ProfileActivity on click of ProfileView in ActionBar
 	public void onProfileView(MenuItem mi) {
 		
 		final Intent profileViewIntent = 
 				new Intent(TimelineActivity.this, ProfileActivity.class);
+		startActivity(profileViewIntent);
+	}
+	
+	// Also show ProfileActivity when a user's profile is clicked in the
+	// home or mentions timelines.
+	@Override 
+	public void onProfileImageClick(User user) {
+		
+		final Intent profileViewIntent = 
+				new Intent(TimelineActivity.this, ProfileActivity.class);
+		profileViewIntent.putExtra("user", user);
 		startActivity(profileViewIntent);
 	}
 	

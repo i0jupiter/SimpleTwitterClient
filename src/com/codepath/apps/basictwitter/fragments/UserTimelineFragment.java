@@ -59,8 +59,8 @@ public class UserTimelineFragment extends TweetListFragment {
 		super.onActivityCreated(savedInstanceState);
 		
 		// Check for Internet availability
-//		if (!NetworkUtils.isNetworkAvailable(getActivity())) {
-//			Toast.makeText(getActivity().getApplicationContext(), 
+//		if (!NetworkUtils.isNetworkAvailable(parentActivity)) {
+//			Toast.makeText(parentActivity.getApplicationContext(), 
 //					"No Internet connection found. Loading previously cached tweets.", 
 //					Toast.LENGTH_LONG).show();
 //			populateTimelineOffline();

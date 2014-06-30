@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.models.Tweet;
+import com.codepath.apps.basictwitter.models.User;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 /**
@@ -29,8 +31,19 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 	private TextView tvTweetTimestamp;
 	private TextView tvTweetText;
 	
-	public TweetArrayAdapter(Context context, List<Tweet> tweets) {
+	// Interface to listen to clicks on profile image from the fragment
+	// (or activity) using this adapter.
+	public interface TweetAdapterInterface {
+		
+		public void profileImageClicked(User user);
+	}
+	private TweetAdapterInterface profileImageClickListener;
+	
+	public TweetArrayAdapter(Context context, List<Tweet> tweets, 
+			TweetAdapterInterface profileImageClickListener) {
+		
 		super(context, 0, tweets);
+		this.profileImageClickListener = profileImageClickListener;
 	}
 	
 	@Override
@@ -48,8 +61,11 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		
 		setupViews(v);
 		setTweetData(tweet);
+		setupClickHandlers();
 		return v;
 	}
+	
+	/* Private methods */
 
 	private void setupViews(View v) {
 		
@@ -61,10 +77,23 @@ public class TweetArrayAdapter extends ArrayAdapter<Tweet> {
 		tvTweetText = (TextView) v.findViewById(R.id.tvTweetText);
 	}
 	
+	private void setupClickHandlers() {
+		
+		ivProfileImage.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				profileImageClickListener.profileImageClicked((User) v.getTag());
+			}
+		});
+	}
+	
 	private void setTweetData(final Tweet tweet) {
 		
 		final ImageLoader imageLoader = ImageLoader.getInstance();
 		imageLoader.displayImage(tweet.getUser().getProfileImageUrl(), ivProfileImage);
+		ivProfileImage.setTag(tweet.getUser());
+		
 		tvUserName.setText(tweet.getUser().getName());
 		tvUserScreenName.setText("@" + tweet.getUser().getScreenName());
 		tvTweetTimestamp.setText(tweet.getCreatedAt());

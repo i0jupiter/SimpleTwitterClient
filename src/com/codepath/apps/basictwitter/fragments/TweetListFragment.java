@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,9 +17,11 @@ import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApplication;
 import com.codepath.apps.basictwitter.TwitterClient;
 import com.codepath.apps.basictwitter.adapters.TweetArrayAdapter;
+import com.codepath.apps.basictwitter.adapters.TweetArrayAdapter.TweetAdapterInterface;
 import com.codepath.apps.basictwitter.helpers.NetworkUtils;
 import com.codepath.apps.basictwitter.listeners.EndlessScrollListener;
 import com.codepath.apps.basictwitter.models.Tweet;
+import com.codepath.apps.basictwitter.models.User;
 import com.codepath.apps.basictwitter.models.UserTimeline;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -31,13 +34,40 @@ import eu.erikw.PullToRefreshListView.OnRefreshListener;
  * @author shine
  *
  */
-public abstract class TweetListFragment extends Fragment {
+public abstract class TweetListFragment 
+		extends Fragment 
+		implements TweetAdapterInterface {
 	
 	protected ArrayList<Tweet> tweets;
 	protected ArrayAdapter<Tweet> aTweets;
 	protected PullToRefreshListView ptrlvTweets;
 	
 	protected TwitterClient twitterClient;
+	
+	// Hold the activity of this fragment in this variable to avoid calling
+	// getActivity().
+	protected Activity parentActivity;
+	
+	// Interface to communicate profile image clicks to the activity of this fragment
+	public interface OnProfileImageClickListener {
+		
+		public void onProfileImageClick(User user);
+	}
+	private OnProfileImageClickListener onProfileImageClickListener;
+	
+	@Override
+	public void onAttach(Activity activity) {
+		
+		super.onAttach(activity);
+		parentActivity = activity;
+		
+		try {
+			onProfileImageClickListener = (OnProfileImageClickListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement "
+					+ "OnProfileImageClickListener");
+		}
+	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,10 +77,10 @@ public abstract class TweetListFragment extends Fragment {
 		twitterClient = TwitterApplication.getRestClient();
 		
 		tweets = new ArrayList<Tweet>();
-		// XXX fix this! Use getActivity() sparingly.
-		aTweets = new TweetArrayAdapter(getActivity(), tweets);
+		aTweets = new TweetArrayAdapter(parentActivity, tweets, this /* pass this fragment to the
+			adapter, so that it can listen to profile image clicks */);
 		
-		if (NetworkUtils.isNetworkAvailable(getActivity())) {
+		if (NetworkUtils.isNetworkAvailable(parentActivity)) {
 			
 			// Internet is available. Prepare to get timeline from Twitter
 			// Get the current user's timeline first to fetch their username/image profile URL, etc 
@@ -81,6 +111,20 @@ public abstract class TweetListFragment extends Fragment {
 		handleTimelineScroll();
 	}
 	
+	/**
+	 * Implement the functionality when a profile image is clicked in TweetArrayAdapter. 
+	 * Basically pass off the user's screen name to the parent activity of this fragment
+	 * so that another fragment can be launched from there. 
+	 * Two fragments should only communicate via an activity and not be coupled together.
+	 * 
+	 * @param userScreenName -- the screen name of the user whose profile image was clicked
+	 */
+	@Override
+	public void profileImageClicked(User user) {
+		
+		onProfileImageClickListener.onProfileImageClick(user);
+	}
+ 	
 	/**
 	 * Populate timeline initially
 	 */

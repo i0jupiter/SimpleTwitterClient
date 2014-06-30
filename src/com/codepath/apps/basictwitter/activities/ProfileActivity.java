@@ -13,15 +13,18 @@ import android.widget.TextView;
 import com.codepath.apps.basictwitter.R;
 import com.codepath.apps.basictwitter.TwitterApplication;
 import com.codepath.apps.basictwitter.TwitterClient;
+import com.codepath.apps.basictwitter.fragments.TweetListFragment;
 import com.codepath.apps.basictwitter.fragments.UserTimelineFragment;
 import com.codepath.apps.basictwitter.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class ProfileActivity extends FragmentActivity {
+public class ProfileActivity 
+		extends FragmentActivity 
+		implements TweetListFragment.OnProfileImageClickListener {
 	
 	private TwitterClient twitterClient;
-	private String myScreenName = null;
+	private String screenName = null;
 	
 	private ImageView ivProfileImage;
 	private TextView tvUserName;
@@ -39,21 +42,21 @@ public class ProfileActivity extends FragmentActivity {
 		
 		setupViews();
 		
-		// Get my profile info.
-		// This gets the screen name, among other things
-		getMyProfile();
+		getAndPopulateUserAttributes();
+		getActionBar().setTitle("@" + screenName);
 		
 		// Create the timeline list fragment.
 		// This is different from TweeetListFragment as it doesn't support infinite
 		// scroll or pull-to-refresh.
-		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		final UserTimelineFragment userTimelineFragment = 
-				UserTimelineFragment.newInstance(myScreenName);
-		ft.replace(R.id.flContainer, userTimelineFragment);
-		ft.commit();
+		createUserTimelineFragment();
 	}
-	
-	
+
+	// When the profile image in the user timeline is clicked, nothing happens.
+	@Override 
+	public void onProfileImageClick(User user) {
+		
+	}
+
 	/* Private methods */
 	
 	private void setupViews() {
@@ -64,6 +67,22 @@ public class ProfileActivity extends FragmentActivity {
 		tvUserDescription = (TextView) findViewById(R.id.tvUserDescription);
 		tvFollowers = (TextView) findViewById(R.id.tvFollowers);
 		tvFollowing = (TextView) findViewById(R.id.tvFollowing);
+	}
+	
+	// Determine if the current user's profile is being shown, or another's.
+	// Populate the attributes accordingly.
+	private void getAndPopulateUserAttributes() {
+		
+		final Bundle bundle = getIntent().getExtras();
+		if (bundle == null || bundle.isEmpty()) {
+			// No data was passed in intent. Show the current user's profile.
+			getMyProfile(); // This gets the screen name, among other things
+		} else {
+			// A user was passed in. Populate their profile attributes.
+			final User user = (User) getIntent().getSerializableExtra("user");
+			populateProfileInfo(user);
+			screenName = user.getScreenName();
+		}
 	}
 	
 	private void getMyProfile() {
@@ -95,7 +114,7 @@ public class ProfileActivity extends FragmentActivity {
 				
 				populateProfileInfo(me);
 				
-				myScreenName = me.getScreenName();
+				screenName = me.getScreenName();
 			}
 		});
 	}
@@ -110,4 +129,14 @@ public class ProfileActivity extends FragmentActivity {
 		tvFollowing.setText(user.getFollowingCount() + " Following");
 	}
 	
+	// Replace the placeholder fragment with the user timeline one
+	// and pass the screen name to call the appropriate Twitter API.
+	private void createUserTimelineFragment() {
+		
+		final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		final UserTimelineFragment userTimelineFragment = 
+				UserTimelineFragment.newInstance(screenName);
+		ft.replace(R.id.flContainer, userTimelineFragment);
+		ft.commit();
+	}
 }

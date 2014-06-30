@@ -118,14 +118,17 @@ public class ComposeTweetActivity extends Activity {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				
+				tvTweetCharCount.setTextColor(Color.GRAY);
 				// XXX Using deprecated methods is bad but will live with it for now.
 				btnUpdateStatus.setBackgroundDrawable(roundCornersActive);
 				btnUpdateStatus.setEnabled(true);
+				
 				final int remainingChars = MAX_CHAR_LIMIT - s.length(); 
 				tvTweetCharCount.setText(Integer.toString(remainingChars));
+				
 				if (remainingChars < 11) {
 					tvTweetCharCount.setTextColor(Color.RED);
-				}
+				} 
 				if (remainingChars < 1) {
 					btnUpdateStatus.setBackgroundDrawable(roundCornersInctive);
 					btnUpdateStatus.setEnabled(false);

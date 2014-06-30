@@ -72,7 +72,7 @@ public class DateTimeUtils {
 		Log.d("debug", "Relative date didn't match pattern: " + fullRelativeDate);
 		final String[] info = fullRelativeDate.split("\\s");
 		if (info.length > 2) {
-			sb.append(info[0].toString()).append(info[1].toString().substring(0, 1));
+			sb.append(info[0].toString()).append(" ").append(info[1].toString().substring(0, 1));
 		} else {
 			sb.append(info[0].toString());
 		}

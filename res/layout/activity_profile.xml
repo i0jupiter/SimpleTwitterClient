@@ -19,7 +19,8 @@
 		        android:layout_alignParentLeft="true"
 		        android:layout_alignParentTop="true"
 		        android:layout_marginTop="5dp"
-		        android:src="@android:drawable/screen_background_light_transparent" />
+		        android:src="@android:drawable/screen_background_light_transparent"
+		        android:contentDescription="@android:color/transparent" />
         
         	<TextView
 		        android:id="@+id/tvUserName"
