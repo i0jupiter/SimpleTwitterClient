@@ -5,7 +5,6 @@
     <style name="TimelineActionBarTheme"
            parent="@android:style/Theme.Holo.Light.DarkActionBar">
         <item name="android:actionBarStyle">@style/TimelineActionBar</item>
-        <item name="android:actionBarTabStyle">@style/TimelineActionBarTabs</item>
         <item name="android:actionBarTabTextStyle">@style/TimelineActionBarTabText</item>
     </style>
     
@@ -13,12 +12,6 @@
     <style name="TimelineActionBar"
            parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
         <item name="android:background">#4099FF</item>
-    </style>
-    
-    <!-- ActionBar tab styles -->
-    <style name="TimelineActionBarTabs"
-           parent="@android:style/Widget.ActionBar.TabView">
-        <item name="android:background">#f5f5f0</item>
     </style>
     
     <style name="TimelineActionBarTabText"
